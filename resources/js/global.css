@@ -1,0 +1,33 @@
+body, html {
+    background-color: #f6f6f6;
+    color: #333;
+    font-size: 16px;
+}
+
+a {
+    color: #4e4e4e;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a:hover {
+    color: #e57373;
+}
+
+.rounded-borders-lg {
+    border-radius: 8px;
+}
+
+.text-title {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 32px;
+}
+
+.text-size-sm {
+    font-size: 14px;
+}
+
+.base-width {
+    width: 1180px;
+}

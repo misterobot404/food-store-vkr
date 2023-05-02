@@ -1,12 +1,13 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "./pages/Home.vue";
-import Account from "./pages/Account.vue";
-import PageNotFound from "./pages/PageNotFound.vue";
+import Catalog from "./pages/Catalog.vue";
+import Basket from "@/pages/Basket.vue";
+import Orders from "@/pages/Orders.vue";
 
 const routes = [
-    {path: '/', component: Home},
-    {path: '/account', component: Account},
-    {path: "/:pathMatch(.*)*", component: PageNotFound},
+    {path: '/', component: Catalog},
+    {path: '/basket', component: Basket},
+    {path: '/orders', component: Orders},
+    {path: '/admin_panel', component: Basket},
 ]
 
 const router = createRouter({

@@ -1,10 +1,10 @@
 <template>
-    Профиль
+
 </template>
 
 <script>
 export default {
-    name: "Home"
+    name: "AdminPanel"
 }
 </script>
 

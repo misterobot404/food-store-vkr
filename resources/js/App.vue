@@ -9,7 +9,7 @@ import Layout from "@/components/Layout.vue";
 
 export default {
     name: "App",
-    components: {Layout}
+    components: {Layout},
 }
 </script>
 
