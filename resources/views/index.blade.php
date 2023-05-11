@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="/images/logo.svg">
     <link href="https://fonts.googleapis.com/css?family=Roboto|Material+Icons|Material+Icons+Outlined&display=block" rel="stylesheet" media="trick" onload="media='all'">
-    <title>Дары природы - свежие фрукты и овощи</title>
+    <title>Дары природы - Свежие фрукты и овощи</title>
 </head>
 <body>
 <div id="app"></div>

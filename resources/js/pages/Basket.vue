@@ -47,9 +47,9 @@
 </template>
 
 <script>
-import {useUserStore} from "@/stores/user";
-import {useBasketStore} from "@/stores/basket";
-import {useProductsStore} from "@/stores/products";
+import {useUserStore} from "../stores/user";
+import {useBasketStore} from "../stores/basket";
+import {useProductsStore} from "../stores/products";
 import {mapActions, mapState} from "pinia";
 
 export default {
@@ -86,8 +86,7 @@ export default {
                 return;
             }
 
-            this.$q.notify({type: "positive", message: "Оформление заказа завершено. Заказ ожидает Вас в пункте выдачи!"});
-            this.removeAllBasketItems();
+            this.$router.push("checkout");
         }
     },
     beforeMount() {

@@ -59,8 +59,8 @@
 <script>
 import axios from "axios";
 import {mapActions, mapState} from "pinia";
-import {useBasketStore } from '@/stores/basket';
-import {useProductsStore} from "@/stores/products";
+import {useBasketStore } from '../stores/basket';
+import {useProductsStore} from "../stores/products";
 
 export default {
     name: "Catalog",

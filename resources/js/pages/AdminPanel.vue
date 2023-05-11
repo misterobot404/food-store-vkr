@@ -1,5 +1,7 @@
 <template>
-
+  <div>
+      Панель администратор
+  </div>
 </template>
 
 <script>

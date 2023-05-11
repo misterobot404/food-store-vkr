@@ -51,10 +51,18 @@
                     <template v-if="user">
                         <a class="column items-center">
                             <q-icon name="o_account_circle" size="24px" class="block"/>
-                            <div style="margin-top: 2px">{{ user.login }}</div>
+                            <div style="margin-top: 2px">{{ user.name }}</div>
                             <q-menu auto-close>
                                 <q-list>
-                                    <q-item clickable>
+                                    <template v-if="user.is_admin">
+                                        <q-item clickable @click="$router.push('/admin_panel')">
+                                            <q-item-section avatar style="min-width: 28px; padding-right: 8px">
+                                                <q-icon name="admin_panel_settings"/>
+                                            </q-item-section>
+                                            <q-item-section class="text-size-sm">Панель управления</q-item-section>
+                                        </q-item>
+                                    </template>
+                                    <q-item clickable @click="logout()">
                                         <q-item-section avatar style="min-width: 28px; padding-right: 8px">
                                             <q-icon name="logout"/>
                                         </q-item-section>
@@ -65,7 +73,7 @@
                         </a>
                     </template>
                     <template v-else>
-                        <a class="column items-center" @click="singin_dialog = true">
+                        <a class="column items-center" @click="show_signin = true">
                             <q-icon name="o_account_circle" size="24px" class="block"/>
                             <div style="margin-top: 2px">Войти</div>
                         </a>
@@ -81,61 +89,188 @@
         </div>
     </main>
 
-    <q-dialog v-model="singin_dialog">
+    <q-dialog v-model="show_signin" persistent>
         <q-card>
-            <q-card-section>
-                <div class="text-h6">Авторизация</div>
-            </q-card-section>
+            <form @submit.prevent="signin()">
+                <q-card-section class="row items-center">
+                    <div class="text-h6">Авторизация</div>
+                    <q-space/>
+                    <q-btn icon="close" flat round dense v-close-popup/>
+                </q-card-section>
 
-            <q-separator />
+                <q-separator/>
 
-            <q-card-section>
-            </q-card-section>
+                <q-card-section class="q-gutter-y-md">
+                    <q-input v-model="signin_email" label="Введите электронную почту" filled type="email" required>
+                        <template v-slot:prepend>
+                            <q-icon name="email"/>
+                        </template>
+                    </q-input>
+                    <q-input v-model="signin_password" label="Введите пароль" filled type="password" required>
+                        <template v-slot:prepend>
+                            <q-icon name="password"/>
+                        </template>
+                    </q-input>
+                </q-card-section>
 
-            <q-separator />
-            <q-card-actions align="right">
-                <q-btn @click="singup_dialog = true" flat label="Регистрация" color="primary" v-close-popup />
-                <q-btn flat label="Закрыть" color="primary" v-close-popup />
-            </q-card-actions>
+                <q-separator/>
+                <q-card-section class="flex justify-end q-gutter-x-xs">
+                    <q-btn @click="show_signup = true" flat label="Регистрация" color="primary" v-close-popup/>
+                    <q-btn label="Подтвердить" color="primary" type="submit" :loading="signin_loading"/>
+                </q-card-section>
+            </form>
         </q-card>
     </q-dialog>
-
-    <q-dialog v-model="singup_dialog">
+    <q-dialog v-model="show_signup" persistent>
         <q-card>
-            <q-card-section>
-                <div class="text-h6">Регистрация</div>
-            </q-card-section>
+            <form @submit.prevent="signup()">
+                <q-card-section class="row items-center">
+                    <div class="text-h6">Регистрация</div>
+                    <q-space/>
+                    <q-btn icon="close" flat round dense v-close-popup/>
+                </q-card-section>
 
-            <q-separator />
+                <q-separator/>
 
-            <q-card-section>
-            </q-card-section>
+                <q-card-section class="q-gutter-y-md">
+                    <q-input v-model="signup_name" label="Введите имя" filled required>
+                        <template v-slot:prepend>
+                            <q-icon name="face"/>
+                        </template>
+                    </q-input>
+                    <q-input v-model="signup_email" label="Введите электронную почту" filled type="email" required>
+                        <template v-slot:prepend>
+                            <q-icon name="email"/>
+                        </template>
+                    </q-input>
+                    <q-input v-model="signup_password" label="Введите пароль" filled type="password" required
+                             minlength="6">
+                        <template v-slot:prepend>
+                            <q-icon name="password"/>
+                        </template>
+                    </q-input>
+                    <q-input v-model="signup_confirm_password" label="Повторите пароль" filled type="password" required
+                             minlength="6">
+                        <template v-slot:prepend>
+                            <q-icon name="password"/>
+                        </template>
+                    </q-input>
+                </q-card-section>
 
-            <q-separator />
-            <q-card-actions align="right">
-                <q-btn @click="singin_dialog = true" flat label="Авторизация" color="primary" v-close-popup />
-                <q-btn flat label="Закрыть" color="primary" v-close-popup />
-            </q-card-actions>
+                <q-separator/>
+                <q-card-section class="flex justify-end q-gutter-x-xs">
+                    <q-btn @click="show_signin = true" flat label="Авторизация" color="primary" v-close-popup/>
+                    <q-btn label="Подтвердить" color="primary" type="submit" :loading="signup_loading"/>
+                </q-card-section>
+            </form>
         </q-card>
     </q-dialog>
 </template>
 
 <script>
 import {mapState} from "pinia";
-import {useBasketStore} from '@/stores/basket';
-import {useUserStore} from "@/stores/user";
+import {useBasketStore} from '../stores/basket';
+import {useUserStore} from "../stores/user";
+import axios from "axios";
 
 export default {
     name: "Layout",
     data() {
         return {
-            singin_dialog: false,
-            singup_dialog: false,
+            // signin
+            signin_email: null,
+            signin_password: null,
+            signin_loading: false,
+
+            // signup
+            signup_name: null,
+            signup_email: null,
+            signup_password: null,
+            signup_confirm_password: null,
+            signup_loading: false
         }
     },
     computed: {
-        ...mapState(useUserStore, ["market_location", "work_time", "phonenumber", "user"]),
-        ...mapState(useBasketStore, ['basket'])
+        ...mapState(useUserStore, ["market_location", "work_time", "phonenumber", "user", "token"]),
+        ...mapState(useBasketStore, ['basket']),
+        show_signin: {
+            get() {
+                return useUserStore().show_signin;
+            },
+            set(newValue) {
+                useUserStore().show_signin = newValue;
+            }
+        },
+        show_signup: {
+            get() {
+                return useUserStore().show_signup;
+            },
+            set(newValue) {
+                useUserStore().show_signup = newValue;
+            }
+        }
+    },
+    methods: {
+        async signin() {
+            this.signin_loading = true;
+            return useUserStore().signin(this.signin_email, this.signin_password)
+                .then(() => {
+                    this.$q.notify({type: "positive", message: "Авторизация выполнена"});
+                    useUserStore().show_signin = false;
+                })
+                .catch((response) => {
+                    if (response.status = 403) {
+                        this.$q.notify({type: "negative", message: "Неверные данные авторизации"});
+                    } else {
+                        this.$q.notify({type: "negative", message: "Ошибка сервера"});
+                    }
+                })
+                .finally(() => this.signin_loading = false)
+        },
+        signup() {
+            if (this.signup_password.length < 6) {
+                this.$q.notify({type: "negative", message: "Длина пароля менее 6 символов"});
+                return;
+            }
+
+            if (this.signup_password !== this.signup_confirm_password) {
+                this.$q.notify({type: "negative", message: "Пароли не совпадают"});
+                return;
+            }
+
+            this.signup_loading = true;
+            useUserStore().signup(this.signup_name, this.signup_email, this.signup_password)
+                .then(() => {
+                    this.signin_email = this.signup_email;
+                    this.signin_password = this.signup_password;
+                    this.signin().then(() => {
+                        this.$q.notify({type: "positive", message: "Регистрация выполнена"});
+                        useUserStore().show_signup = false;
+                    })
+                })
+                .catch((response) => {
+                    if (response.status = 422) {
+                        this.$q.notify({type: "negative", message: "Такая почта уже зарегистрирована"});
+                    } else {
+                        this.$q.notify({type: "negative", message: "Ошибка сервера"});
+                    }
+                })
+                .finally(() => this.signup_loading = false)
+        },
+        logout() {
+            useUserStore().logout()
+                .then(() => {
+                    this.$q.notify({type: "positive", message: "Вы вышли из своей учётной записи"});
+                    if (this.$route.meta.requiresAuth) {
+                        this.$router.push("/");
+                    }
+                });
+        }
+    },
+    beforeMount() {
+        if (this.token) {
+            axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.token;
+        }
     }
 }
 </script>
