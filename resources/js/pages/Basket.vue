@@ -67,6 +67,7 @@ import {useBasketStore} from "../stores/basket";
 import {useProductsStore} from "../stores/products";
 import {mapActions, mapState} from "pinia";
 import axios from "axios";
+import {Notify} from "quasar";
 
 export default {
     name: "Basket",
@@ -76,7 +77,7 @@ export default {
         }
     },
     computed: {
-        ...mapState(useUserStore, ["market_location", "work_time"]),
+        ...mapState(useUserStore, ["market_location", "work_time", "token", "show_signin"]),
         ...mapState(useBasketStore, ["basket"]),
         ...mapState(useProductsStore, ["products"]),
     },
@@ -88,6 +89,16 @@ export default {
             return this.products.find(product => product.id === id)
         },
         confirmation() {
+            if (!this.token) {
+                const user_store = useUserStore();
+                this.$q.notify({
+                    icon: "info",
+                    message: "Для продолжения необходимо авторизоваться"
+                });
+                user_store.show_signin = true;
+                return;
+            }
+
             let buy_products = [];
             this.basket.forEach(el => buy_products.push(this.getProductById(el)));
 
@@ -103,6 +114,8 @@ export default {
             }
 
             this.confirm_loading = true;
+
+
             axios.post("/api/orders", {
                 products: JSON.stringify(buy_products),
                 price: price
