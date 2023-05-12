@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\OrdersController;
 use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\Api\AuthController;
 use Illuminate\Http\Request;
@@ -30,4 +31,11 @@ Route::get('/products', [ProductsController::class, 'get']);
 // Для авторизованных пользователей
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::put('/products/updateAll', [ProductsController::class, 'updateAll']);
+    Route::post('/products', [ProductsController::class, 'create']);
+    Route::delete('/products/{id}', [ProductsController::class, 'delete']);
+
+    Route::post('/orders', [OrdersController::class, 'create']);
+    Route::get('/orders', [OrdersController::class, 'get']);
 });

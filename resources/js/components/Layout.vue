@@ -57,9 +57,9 @@
                                     <template v-if="user.is_admin">
                                         <q-item clickable @click="$router.push('/admin_panel')">
                                             <q-item-section avatar style="min-width: 28px; padding-right: 8px">
-                                                <q-icon name="admin_panel_settings"/>
+                                                <q-icon name="history_edu"/>
                                             </q-item-section>
-                                            <q-item-section class="text-size-sm">Панель управления</q-item-section>
+                                            <q-item-section class="text-size-sm">Управление товаром</q-item-section>
                                         </q-item>
                                     </template>
                                     <q-item clickable @click="logout()">

@@ -1,5 +1,5 @@
 <template>
-    <template v-if="is_ready">
+    <template v-if="products">
         <div class="text-title q-mb-lg">Каталог</div>
         <div class="flex q-col-gutter-x-lg">
             <!-- Категории -->
@@ -44,7 +44,7 @@
                             </q-card-section>
 
                             <q-card-section class="q-pt-none">
-                                <div class="text-subtitle2">
+                                <div class="text-subtitle2" style="font-weight: 400">
                                     {{ !product.count_kg ? "Нет в наличии" : `Осталось: ${product.count_kg} кг.` }} ・ {{ product.price }} ₽ за кг
                                 </div>
                             </q-card-section>
@@ -54,10 +54,18 @@
             </div>
         </div>
     </template>
+    <template v-else>
+        <div class="text-center q-mt-xl">
+            <q-spinner
+                color="red-5"
+                size="5em"
+                :thickness="2"
+            />
+        </div>
+    </template>
 </template>
 
 <script>
-import axios from "axios";
 import {mapActions, mapState} from "pinia";
 import {useBasketStore } from '../stores/basket';
 import {useProductsStore} from "../stores/products";
@@ -66,7 +74,6 @@ export default {
     name: "Catalog",
     data() {
         return {
-            is_ready: false,
             selected_category_index: 0,
         }
     },
@@ -86,7 +93,7 @@ export default {
         }
     },
     beforeMount() {
-        this.getProducts().then(() => this.is_ready = true);
+        this.getProducts();
     }
 }
 </script>

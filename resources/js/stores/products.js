@@ -9,12 +9,16 @@ export const useProductsStore = defineStore('products', {
         }
     },
     actions: {
-        async get() {
-            axios.get('/api/products')
+        get() {
+            return axios.get('/api/products')
                 .then((response) => {
                     this.product_categories = [{name: "Все", logo_url: "/images/product_categories/Всё.png"}, ...response.data.product_categories];
-                    this.products = response.data.products;
+                    this.products = response.data.products.reverse();
                 })
+        },
+        updateAllProducts(products) {
+            return axios.put('/api/products/updateAll', {products: JSON.stringify(products)})
+                .then((response) => this.products = response.data.products)
         },
     }
 })
