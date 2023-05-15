@@ -22,7 +22,7 @@
             <div class="col row q-col-gutter-md">
                 <template v-for="product in products_by_selected_category">
                     <div class="col-4">
-                        <q-card class="my-card" flat bordered>
+                        <q-card class="my-card overflow-hidden" flat bordered>
                             <q-img :src="product.image_url" width="300px" height="200px"/>
 
                             <q-card-section>
